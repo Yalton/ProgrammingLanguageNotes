@@ -1,0 +1,292 @@
+---
+title: "Typescript Cheatsheet"
+author: "devhints.io"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: pdf_document
+---
+
+\begin{abstract}
+\center Typescript cheatsheet adapted from devhints.io
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+# Introduction 
+
+TypeScript is a programming language developed and maintained by Microsoft. It is a typed superset of JavaScript that compiles to plain JavaScript. It adds optional static typing to the language and helps to catch common mistakes in code by providing type information at compile time. TypeScript can also be used to develop JavaScript applications for both client-side and server-side execution. It is open-source and cross-platform, meaning it can be used to create applications for the web, desktop, and mobile devices. The language is designed for large-scale applications and transcompiles to JavaScript, making it easier to read and debug. It supports features like classes, modules, and interfaces, which helps to write object-oriented code. Additionally, TypeScript can be used to create definition files that can be used to describe existing JavaScript libraries, providing better intellisense and type safety when using them.
+
+# Typescript cheatsheet
+
+
+## Basic types
+
+```{typescript eval=FALSE}
+any
+void
+
+boolean
+number
+string
+
+null
+undefined
+
+bigint
+symbol
+
+string[]          /* or Array<string> */
+[string, number]  /* tuple */
+
+string | null | undefined   /* union */
+
+never  /* unreachable */
+unknown
+
+enum Color {
+  Red,
+  Green,
+  Blue = 4
+};
+
+let c: Color = Color.Green
+```
+
+## Declarations
+
+```{typescript eval=FALSE}
+let isDone: boolean
+let isDone: boolean = false
+
+function add (a: number, b: number): number {
+  return a + b
+}
+
+// Return type is optional
+function add (a: number, b: number) { ... }
+```
+
+## Type assertions
+
+### Variables
+
+```{typescript eval=FALSE}
+let len: number = (input as string).length
+let len: number = (<string> input).length  /* not allowed in JSX */
+```
+
+## Functions
+
+```{typescript eval=FALSE}
+function object(this: {a: number, b: number}, a: number, b: number) {
+  this.a = a;
+  this.b = b;
+  return this;
+}
+
+// this is used only for type declaration
+let a = object(1,2);
+// a has type {a: number, b: number}
+```
+
+## Interfaces
+### Inline
+
+```{typescript eval=FALSE}
+function printLabel (options: { label: string }) {
+  console.log(options.label)
+}
+
+// Note the semicolon
+function getUser (): { name: string; age?: number } {
+}
+```
+
+## Explicit
+
+```{typescript eval=FALSE}
+interface LabelOptions {
+  label: string
+}
+
+function printLabel(options: LabelOptions) { ... }
+```
+
+### Optional properties
+
+```{typescript eval=FALSE}
+interface User {
+  name: string;
+  age?: number;
+}
+```
+
+### Read only
+
+```{typescript eval=FALSE}
+interface User {
+  readonly name: string
+}
+```
+
+### Dynamic keys
+
+```{typescript eval=FALSE}
+{
+  [key: string]: Object[]
+}
+```
+
+## Type aliases
+
+```{typescript eval=FALSE}
+type Name = string | string[]
+
+Intersection
+
+interface Colorful { ... }
+
+interface Circle { ... }
+ 
+type ColorfulCircle = Colorful & Circle;
+```
+
+## Function types
+
+```{typescript eval=FALSE}
+interface User { ... }
+
+function getUser(callback: (user: User) => any) { callback({...}) }
+
+getUser(function (user: User) { ... })
+```
+
+## Classes
+
+```{typescript eval=FALSE}
+class Point {
+  x: number
+  y: number
+  static instances = 0
+  constructor(x: number, y: number) {
+    this.x = x
+    this.y = y
+  }
+}
+```
+
+### Inheritance
+
+```{typescript eval=FALSE}
+class Point {...}
+
+class Point3D extends Point {...}
+
+interface Colored {...}
+
+class Pixel extends Point implements Colored {...}
+```
+
+### Short fields initialisation
+
+```{typescript eval=FALSE}
+class Point {
+  static instances = 0;
+  constructor(
+    public x: number,
+    public y: number,
+  ){}
+}
+```
+
+### Fields which do not require initialisation
+
+```{typescript eval=FALSE}
+class Point {
+  public someUselessValue!: number;
+  ...
+}
+```
+
+## Generics
+
+```{typescript eval=FALSE}
+class Greeter<T> {
+  greeting: T
+  constructor(message: T) {
+    this.greeting = message
+  }
+}
+
+let greeter = new Greeter<string>('Hello, world')
+```
+
+## Modules
+
+```{typescript eval=FALSE}
+export interface User { ... }
+```
+
+## Type extraction
+
+```{typescript eval=FALSE}
+interface Building {
+  room: {
+    door: string;
+    walls: string[];
+  };
+}
+
+type Walls = Building['room']['walls']; // string[]
+```
+
+## Key of Type Operator
+
+```{typescript eval=FALSE}
+type Point = { x: number; y: number };
+
+type P = keyof Point; // x | y
+```
+
+## Conditinal Types
+
+```{typescript eval=FALSE}
+// SomeType extends OtherType ? TrueType : FalseType;
+
+type ToArray<T> = T extends any ? T[] : never;
+
+type StrArrOrNumArr = ToArray<string | number>; // string[] | number[]
+```
+
+### Inferring
+
+```{typescript eval=FALSE}
+type GetReturnType<T> = T extends (...args: unknown[]) => infer R
+  ? R
+  : never;
+
+type Num = GetReturnType<() => number>; // number
+
+type First<T extends Array<any>> = T extends [infer F, ...infer Rest] ? F : never;
+
+type Str = First<['hello', 1, false]>; // 'hello'
+```
+
+## Literal Type
+
+```{typescript eval=FALSE}
+const point = { x: 4, y: 2 }; // { x: number, y: number }
+
+const literalPoint = { x: 4, y: 2 } as const; // { readonly x: 4, readonly y: 2 };
+```
+
+## Template Literal Types
+
+```{typescript eval=FALSE}
+type SpaceChar = ' ' | '\n' | '\t';
+
+type TrimLeft<S extends string> = S extends `${SpaceChar}${infer Rest}` ? TrimLeft<Rest> : S;
+
+type Str = TrimLeft<'    hello'>; // 'hello'
+```

@@ -1,0 +1,596 @@
+---
+title: "Golang Cheatsheet"
+author: "devhints.io"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: pdf_document
+---
+
+\begin{abstract}
+\center Golang cheatsheet adapted from devhints.io
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+
+# Introduction 
+
+Go (also known as Golang) is a programming language created by Google in 2009. It is a compiled, statically typed language in the tradition of C, with the added benefits of memory safety, garbage collection, structural typing, and CSP-style concurrency. Go's syntax is small compared to other languages, and it is easy to learn and use. The language was designed to be fast, reliable, and simple, and to make it easy to build simple, reliable, and efficient software. Go is also designed to be a language that can be used to build sophisticated applications, with features such as garbage collection, type safety, and a rich standard library. Go is used in many different industries, from web development to DevOps, and it is an increasingly popular language for developing cloud-native applications.
+
+# Go cheatsheet
+
+
+### Hello world
+```{go eval=FALSE}
+hello.go
+
+package main
+
+import "fmt"
+
+func main() {
+  message := greetMe("world")
+  fmt.Println(message)
+}
+
+func greetMe(name string) string {
+  return "Hello, " + name + "!"
+}
+```
+
+```{bash eval=FALSE}
+$ go build
+```
+
+Or try it out in the Go repl, or A Tour of Go.
+
+## Variables
+
+#### Variable declaration
+
+```{go eval=FALSE}
+var msg string
+msg = "Hello"
+
+Shortcut of above (Infers type)
+
+msg := "Hello"
+```
+
+### Constants
+
+```{go eval=FALSE}
+const Phi = 1.618
+```
+
+> Constants can be character, string, boolean, or numeric values.
+
+See: Constants
+
+## Basic types
+
+### Strings
+
+```{go eval=FALSE}
+str := "Hello"
+
+str := `Multiline
+string`
+
+Strings are of type string.
+Numbers
+Typical types
+
+num := 3          // int
+num := 3.         // float64
+num := 3 + 4i     // complex128
+num := byte('a')  // byte (alias for uint8)
+```
+
+### Other types
+
+```{go eval=FALSE}
+var u uint = 7        // uint (unsigned)
+var p float32 = 22.7  // 32-bit float
+```
+
+### Arrays
+
+```{go eval=FALSE}
+// var numbers [5]int
+numbers := [...]int{0, 0, 0, 0, 0}
+```
+
+> Arrays have a fixed size.
+
+### Slices
+
+```{go eval=FALSE}
+slice := []int{2, 3, 4}
+
+slice := []byte("Hello")
+```
+
+> Slices have a dynamic size, unlike arrays.
+
+### Pointers
+
+```{go eval=FALSE}
+func main () {
+  b := *getPointer()
+  fmt.Println("Value is", b)
+}
+ 
+
+func getPointer () (myPointer *int) {
+  a := 234
+  return &a
+}
+ 
+
+a := new(int)
+*a = 234
+```
+
+> Pointers point to a memory location of a variable. Go is fully garbage-collected.
+
+__See: Pointers__
+
+### Type conversions
+
+```{go eval=FALSE}
+i := 2
+f := float64(i)
+u := uint(i)
+```
+
+__See: Type conversions__
+
+## Flow control
+
+### Conditional
+
+```{go eval=FALSE}
+if day == "sunday" || day == "saturday" {
+  rest()
+} else if day == "monday" && isTired() {
+  groan()
+} else {
+  work()
+}
+ 
+ ```
+ 
+
+> See: 
+
+### Statements in if
+
+```{go eval=FALSE}
+if _, err := doThing(); err != nil {
+  fmt.Println("Uh oh")
+}
+```
+ 
+
+> A condition in an if statement can be preceded with a statement before a ;. Variables declared by the statement are only in scope until the end of the if.
+
+__See: If with a short statement__
+
+### Switch
+
+```{go eval=FALSE}
+switch day {
+  case "sunday":
+    // cases don't "fall through" by default!
+    fallthrough
+
+  case "saturday":
+    rest()
+
+  default:
+    work()
+}
+```
+
+> See: Switch
+
+### For loop
+
+```{go eval=FALSE}
+for count := 0; count <= 10; count++ {
+  fmt.Println("My counter is at", count)
+}
+```
+
+__See: For loops__
+
+### For-Range loop
+
+```{go eval=FALSE}
+entry := []string{"Jack","John","Jones"}
+for i, val := range entry {
+  fmt.Printf("At position %d, the character %s is present\n", i, val)
+}
+
+See: For-Range loops
+While loop
+
+n := 0
+x := 42
+for n != x {
+  n := guess()
+}
+```
+
+See: Go’s “while”
+
+## Functions
+
+### Lambdas
+
+```{go eval=FALSE}
+myfunc := func() bool {
+  return x > 10000
+}
+```
+
+> Functions are first class objects.
+
+### Multiple return types
+
+```{go eval=FALSE}
+a, b := getMessage()
+
+func getMessage() (a string, b string) {
+  return "Hello", "World"
+}
+ 
+```
+
+### Named return values
+
+```{go eval=FALSE}
+func split(sum int) (x, y int) {
+  x = sum * 4 / 9
+  y = sum - x
+  return
+}
+```
+ 
+
+> By defining the return value names in the signature, a return (no args) will return variables with those names.
+
+__See: Named return values__
+
+## Packages
+
+### Importing
+
+```{go eval=FALSE}
+import "fmt"
+import "math/rand"
+
+import (
+  "fmt"        // gives fmt.Println
+  "math/rand"  // gives rand.Intn
+)
+```
+
+> Both are the same.
+
+__See: Importing__
+
+### Aliases
+
+```{go eval=FALSE}
+import r "math/rand"
+ 
+
+r.Intn()
+
+```
+
+#### Exporting names
+
+```{go eval=FALSE}
+func Hello () {
+  ···
+}
+```
+
+Exported names begin with capital letters.
+
+> See: Exported names
+
+### Packages
+
+```{go eval=FALSE}
+package hello
+```
+
+> Every package file has to start with package.
+
+## Concurrency
+
+### Goroutines
+
+```{go eval=FALSE}
+func main() {
+  // A "channel"
+  ch := make(chan string)
+
+  // Start concurrent routines
+  go push("Moe", ch)
+  go push("Larry", ch)
+  go push("Curly", ch)
+
+  // Read 3 results
+  // (Since our goroutines are concurrent,
+  // the order isn't guaranteed!)
+  fmt.Println(<-ch, <-ch, <-ch)
+}
+ 
+ 
+ 
+ 
+ 
+
+func push(name string, ch chan string) {
+  msg := "Hey, " + name
+  ch <- msg
+}
+```
+
+### Channels are concurrency-safe communication objects, used in goroutines.
+
+__See: Goroutines, Channels__
+
+### Buffered channels
+
+```{go eval=FALSE}
+ch := make(chan int, 2)
+ch <- 1
+ch <- 2
+ch <- 3
+// fatal error:
+// all goroutines are asleep - deadlock!
+```
+
+> Buffered channels limit the amount of messages it can keep.
+
+__See: Buffered channels__
+
+### Closing channels
+
+#### Closes a channel
+
+```{go eval=FALSE}
+ch <- 1
+ch <- 2
+ch <- 3
+close(ch)
+```
+
+#### Iterates across a channel until its closed
+
+```{go eval=FALSE}
+for i := range ch {
+  ···
+}
+```
+ 
+
+> Closed if ok == false
+
+v, ok := <- ch
+
+__See: Range and close__
+
+### WaitGroup
+
+```{go eval=FALSE}
+import "sync"
+
+func main() {
+  var wg sync.WaitGroup
+  
+  for _, item := range itemList {
+    // Increment WaitGroup Counter
+    wg.Add(1)
+    go doOperation(&wg, item)
+  }
+  // Wait for goroutines to finish
+  wg.Wait()
+  
+}
+ 
+ 
+ 
+ 
+
+func doOperation(wg *sync.WaitGroup, item string) {
+  defer wg.Done()
+  // do operation on item
+  // ...
+}
+```
+
+A WaitGroup waits for a collection of goroutines to finish. The main goroutine calls Add to set the number of goroutines to wait for. The goroutine calls wg.Done() when it finishes. See: WaitGroup
+
+## Error control
+
+### Defer
+
+```{go eval=FALSE}
+func main() {
+  defer fmt.Println("Done")
+  fmt.Println("Working...")
+}
+```
+
+Defers running a function until the surrounding function returns. The arguments are evaluated immediately, but the function call is not ran until later.
+
+See: Defer, panic and recover
+
+### Deferring functions
+
+```{go eval=FALSE}
+func main() {
+  defer func() {
+    fmt.Println("Done")
+  }()
+  fmt.Println("Working...")
+}
+```
+ 
+ 
+ 
+
+### Lambdas are better suited for defer blocks.
+
+```{go eval=FALSE}
+func main() {
+  var d = int64(0)
+  defer func(d *int64) {
+    fmt.Printf("& %v Unix Sec\n", *d)
+  }(&d)
+  fmt.Print("Done ")
+  d = time.Now().Unix()
+}
+```
+ 
+ 
+
+The defer func uses current value of d, unless we use a pointer to get final value at end of main.
+
+## Structs
+
+### Defining
+```{go eval=FALSE}
+type Vertex struct {
+  X int
+  Y int
+}
+ 
+ 
+ 
+ 
+
+func main() {
+  v := Vertex{1, 2}
+  v.X = 4
+  fmt.Println(v.X, v.Y)
+}
+```
+
+See: Structs
+
+### Literals
+
+```{go eval=FALSE}
+v := Vertex{X: 1, Y: 2}
+
+// Field names can be omitted
+v := Vertex{1, 2}
+
+// Y is implicit
+v := Vertex{X: 1}
+```
+
+You can also put field names.
+
+### Pointers to structs
+
+```{go eval=FALSE}
+v := &Vertex{1, 2}
+v.X = 2
+```
+
+Doing v.X is the same as doing (*v).X, when v is a pointer.
+
+## Methods
+
+### Receivers
+
+```{go eval=FALSE}
+type Vertex struct {
+  X, Y float64
+}
+
+func (v Vertex) Abs() float64 {
+  return math.Sqrt(v.X * v.X + v.Y * v.Y)
+}
+ 
+
+v := Vertex{1, 2}
+v.Abs()
+```
+
+There are no classes, but you can define functions with receivers.
+
+See: Methods
+
+### Mutation
+
+```{go eval=FALSE}
+func (v *Vertex) Scale(f float64) {
+  v.X = v.X * f
+  v.Y = v.Y * f
+}
+ 
+
+v := Vertex{6, 12}
+v.Scale(0.5)
+// `v` is updated
+```
+
+By defining your receiver as a pointer (*Vertex), you can do mutations.
+
+See: Pointer receivers
+
+## Interfaces
+
+### A basic interface
+
+```{go eval=FALSE}
+type Shape interface {
+  Area() float64
+  Perimeter() float64
+}
+```
+
+### Struct
+
+```{go eval=FALSE}
+type Rectangle struct {
+  Length, Width float64
+}
+```
+Struct Rectangle implicitly implements interface Shape by implementing all of its methods.
+
+### Methods
+
+```{go eval=FALSE}
+func (r Rectangle) Area() float64 {
+  return r.Length * r.Width
+}
+```
+
+```{go eval=FALSE}
+func (r Rectangle) Perimeter() float64 {
+  return 2 * (r.Length + r.Width)
+}
+```
+
+The methods defined in Shape are implemented in Rectangle.
+
+### Interface example
+
+```{go eval=FALSE}
+func main() {
+  var r Shape = Rectangle{Length: 3, Width: 4}
+  fmt.Printf("Type of r: %T, Area: %v, Perimeter: %v.", r, r.Area(), r.Perimeter())
+}
+```
